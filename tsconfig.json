@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
     "target": "es2017",
-    "module": "commonjs",
+    "module": "ESNext",
     "removeComments": false,
     "preserveConstEnums": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "experimentalDecorators": true,
     "noImplicitAny": false,
     "allowSyntheticDefaultImports": true,
@@ -18,6 +18,9 @@
     "jsx": "preserve",
     "allowJs": true,
     "resolveJsonModule": true,
+    "paths": {
+      "@/*": ["./src/*"]
+    },
     "typeRoots": [
       "node_modules/@types"
     ]
