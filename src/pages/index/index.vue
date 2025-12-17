@@ -91,7 +91,7 @@
         <view class="user-info-wrapper">
           <view class="user-info" @click="toggleUserMenu">
             <view class="avatar">👤</view>
-            <text class="username">huang jianyong</text>
+            <text class="username">{{ userInfo.name || userInfo.username || 'User' }}</text>
             <text class="dropdown-icon">▼</text>
           </view>
           <!-- 用户下拉菜单 -->
@@ -99,9 +99,9 @@
             <view class="user-profile">
               <view class="user-avatar-large">👤</view>
               <view class="user-details">
-                <text class="user-name">huang jianyong</text>
-                <text class="user-title">Analyst Progr...</text>
-                <text class="user-dept">Operation/DCHBI</text>
+                <text class="user-name">{{ userInfo.name || userInfo.username || 'User' }}</text>
+                <text class="user-title">{{ userInfo.email || '' }}</text>
+                <text class="user-dept">DCH Group</text>
               </view>
             </view>
             <view class="user-menu-divider"></view>
@@ -127,7 +127,7 @@
               <text class="menu-arrow">›</text>
             </view>
             <view class="user-menu-divider"></view>
-            <view class="user-menu-item">
+            <view class="user-menu-item" @click="handleLogout">
               <text class="menu-icon">🚪</text>
               <text class="menu-text">Logout</text>
             </view>
@@ -281,7 +281,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { keycloak } from '../utils/keycloak'
+import { UserInfoManager } from '../../utils/userInfo'
 import logoImage from '../assets/images/image002.jpg'
 import bannerBgImage from '../assets/images/BgGray.png'
 
@@ -289,10 +291,40 @@ const show = ref(false)
 const activeTab = ref('workspace')
 const showUserMenu = ref(false)
 
+// 用户信息
+const userInfo = ref({
+  username: '',
+  name: '',
+  email: '',
+  preferredUsername: ''
+})
+
 // 切换用户菜单
 const toggleUserMenu = () => {
   showUserMenu.value = !showUserMenu.value
 }
+
+// 处理登出
+const handleLogout = () => {
+  if (keycloak) {
+    // 清除用户信息缓存
+    UserInfoManager.clearCache()
+    // 登出
+    keycloak.logout({
+      redirectUri: window.location.origin + '/#/pages/login/index'
+    })
+  }
+}
+
+// 从Keycloak加载用户信息
+onMounted(async () => {
+  if (keycloak && keycloak.authenticated) {
+    const info = await UserInfoManager.getUserInfo()
+    if (info) {
+      userInfo.value = info
+    }
+  }
+})
 </script>
 
 <style scoped>
