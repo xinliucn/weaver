@@ -13,7 +13,7 @@ export default defineConfig<'vite'>(async (merge, { command, mode }) => {
   const baseConfig: UserConfigExport<'vite'> = {
     projectName: 'weaver',
     date: '2025-12-15',
-    designWidth (input) {
+    designWidth (input:any) {
       // 配置 NutUI 375 尺寸
       if (input?.file?.replace(/\\+/g, '/').indexOf('@nutui') > -1) {
         return 375
@@ -47,36 +47,37 @@ export default defineConfig<'vite'>(async (merge, { command, mode }) => {
         }),
         VitePWA({
           registerType: 'autoUpdate',
-          includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
           manifest: {
             name: 'DCH ePortal',
             short_name: 'ePortal',
             description: 'DCH New ePortal Experience',
             theme_color: '#8b2332',
             background_color: '#ffffff',
-            display: 'standalone',
-            icons: [
-              {
-                src: 'pwa-192x192.png',
-                sizes: '192x192',
-                type: 'image/png'
-              },
-              {
-                src: 'pwa-512x512.png',
-                sizes: '512x512',
-                type: 'image/png'
-              },
-              {
-                src: 'pwa-512x512.png',
-                sizes: '512x512',
-                type: 'image/png',
-                purpose: 'any maskable'
-              }
-            ]
+            display: 'standalone'
           },
           workbox: {
-            globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg}'],
+            globPatterns: ['**/*.{js,css,html}'],
+            globIgnores: ['**/node_modules/**/*'],
+            navigateFallback: null,
             runtimeCaching: [
+              {
+                urlPattern: /\/manifest\.webmanifest$/,
+                handler: 'StaleWhileRevalidate',
+                options: {
+                  cacheName: 'manifest-cache'
+                }
+              },
+              {
+                urlPattern: /\.(png|jpg|jpeg|svg|gif|webp|ico)$/,
+                handler: 'CacheFirst',
+                options: {
+                  cacheName: 'images-cache',
+                  expiration: {
+                    maxEntries: 50,
+                    maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
+                  }
+                }
+              },
               {
                 urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
                 handler: 'CacheFirst',

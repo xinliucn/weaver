@@ -5,23 +5,133 @@
       <view class="navbar-left">
         <img :src="logoImage" class="logo" alt="DCH Logo" />
         <view class="nav-menu">
-          <text class="nav-item active">Workspace</text>
-          <text class="nav-item">My Applications</text>
-          <text class="nav-item">Process Center</text>
-          <text class="nav-item more-icon">⋯</text>
+          <view class="nav-item-wrapper">
+            <text
+              :class="['nav-item', { active: activeTab === 'workspace' }]"
+              @click="activeTab = 'workspace'"
+            >
+              Workspace
+            </text>
+            <!-- Workspace 下拉菜单 -->
+            <view class="nav-dropdown-menu">
+              <view class="dropdown-item">DCH Group</view>
+              <view class="dropdown-item">DCH Mainland China</view>
+              <view class="dropdown-item">Group Legal & Compliance</view>
+              <view class="dropdown-item">By Department</view>
+            </view>
+          </view>
+
+          <view class="nav-item-wrapper">
+            <text
+              :class="['nav-item', { active: activeTab === 'applications' }]"
+              @click="activeTab = 'applications'"
+            >
+              My Applications
+            </text>
+            <!-- My Applications 下拉菜单 -->
+            <view class="nav-dropdown-menu wide">
+              <view class="dropdown-item">All Applications</view>
+              <view class="dropdown-item has-submenu">
+                Group Digital and Technology
+                <text class="submenu-arrow">›</text>
+              </view>
+              <view class="dropdown-item has-submenu">
+                Group Finance
+                <text class="submenu-arrow">›</text>
+              </view>
+              <view class="dropdown-item has-submenu">
+                Group Legal and Compliance
+                <text class="submenu-arrow">›</text>
+              </view>
+              <view class="dropdown-item has-submenu">
+                Group HR
+                <text class="submenu-arrow">›</text>
+              </view>
+              <view class="dropdown-item">DCHBI</view>
+              <view class="dropdown-item has-submenu">
+                Common Data Maintenance
+                <text class="submenu-arrow">›</text>
+              </view>
+            </view>
+          </view>
+
+          <view class="nav-item-wrapper">
+            <text class="nav-item more-icon">⋯</text>
+            <!-- 更多菜单下拉框 -->
+            <view class="nav-dropdown-menu">
+              <view class="dropdown-item has-submenu">
+                Process Center
+                <text class="submenu-arrow">›</text>
+              </view>
+              <view class="dropdown-item has-submenu">
+                Knowledge Base
+                <text class="submenu-arrow">›</text>
+              </view>
+              <view class="dropdown-item has-submenu">
+                Organization
+                <text class="submenu-arrow">›</text>
+              </view>
+              <view class="dropdown-item has-submenu">
+                Info Center
+                <text class="submenu-arrow">›</text>
+              </view>
+              <view class="dropdown-item">Delegation</view>
+            </view>
+          </view>
         </view>
       </view>
 
       <view class="navbar-right">
         <view class="search-box">
           <input type="text" placeholder="Search" class="search-input" />
+           <text class="search-icon">🔍</text>
         </view>
         <view class="icon-btn">🔔</view>
         <view class="icon-btn">🌐</view>
-        <view class="user-info">
-          <view class="avatar">👤</view>
-          <text class="username">huang jianyong</text>
-          <text class="dropdown-icon">▼</text>
+        <view class="user-info-wrapper">
+          <view class="user-info" @click="toggleUserMenu">
+            <view class="avatar">👤</view>
+            <text class="username">huang jianyong</text>
+            <text class="dropdown-icon">▼</text>
+          </view>
+          <!-- 用户下拉菜单 -->
+          <view :class="['user-dropdown-menu', { show: showUserMenu }]">
+            <view class="user-profile">
+              <view class="user-avatar-large">👤</view>
+              <view class="user-details">
+                <text class="user-name">huang jianyong</text>
+                <text class="user-title">Analyst Progr...</text>
+                <text class="user-dept">Operation/DCHBI</text>
+              </view>
+            </view>
+            <view class="user-menu-divider"></view>
+            <view class="user-menu-item">
+              <text class="menu-icon">🌐</text>
+              <text class="menu-text">Language</text>
+              <text class="menu-value">English</text>
+              <text class="menu-arrow">›</text>
+            </view>
+            <view class="user-menu-item">
+              <text class="menu-icon">⚙️</text>
+              <text class="menu-text">Personalization</text>
+              <text class="menu-arrow">›</text>
+            </view>
+            <view class="user-menu-item">
+              <text class="menu-icon">🔒</text>
+              <text class="menu-text">Password Settings</text>
+              <text class="menu-arrow">›</text>
+            </view>
+            <view class="user-menu-item">
+              <text class="menu-icon">🎨</text>
+              <text class="menu-text">Theme Center</text>
+              <text class="menu-arrow">›</text>
+            </view>
+            <view class="user-menu-divider"></view>
+            <view class="user-menu-item">
+              <text class="menu-icon">🚪</text>
+              <text class="menu-text">Logout</text>
+            </view>
+          </view>
         </view>
       </view>
     </view>
@@ -36,7 +146,7 @@
             <text class="banner-title">大昌行家書</text>
             <text class="banner-subtitle">ETTER TO DCH</text>
           </view>
-          <img src="../assets/images/BgGray.png" class="banner-image" />
+          <img :src="bannerBgImage" class="banner-image" />
         </view>
 
         <!-- 任务列表 -->
@@ -173,8 +283,16 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import logoImage from '../assets/images/image002.jpg'
+import bannerBgImage from '../assets/images/BgGray.png'
 
 const show = ref(false)
+const activeTab = ref('workspace')
+const showUserMenu = ref(false)
+
+// 切换用户菜单
+const toggleUserMenu = () => {
+  showUserMenu.value = !showUserMenu.value
+}
 </script>
 
 <style scoped>
@@ -189,7 +307,7 @@ const show = ref(false)
   top: 0;
   left: 0;
   right: 0;
-  height: 64px;
+  height: 80px;
   background: white;
   display: flex;
   justify-content: space-between;
@@ -217,21 +335,58 @@ const show = ref(false)
   align-items: center;
 }
 
+.nav-item-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 80px;
+}
+
 .nav-item {
   font-size: 14px;
   color: #666;
   cursor: pointer;
-  padding-bottom: 20px;
+  padding: 0 0 3px 0;
   border-bottom: 3px solid transparent;
+  transition: all 0.2s;
+  line-height: 1.5;
 }
 
 .nav-item.active {
   color: #8b2332;
-  border-bottom-color: #8b2332;
 }
 
 .nav-item:hover {
   color: #8b2332;
+  border-bottom-color: #8b2332;
+}
+
+/* Workspace 导航下拉菜单 */
+.nav-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 0;
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 240px;
+  z-index: 1001;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+}
+
+.nav-dropdown-menu.wide {
+  min-width: 280px;
+}
+
+.nav-item-wrapper:hover .nav-dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
 }
 
 .navbar-right {
@@ -242,15 +397,30 @@ const show = ref(false)
 
 .search-box {
   position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  right: 8px;
+  font-size: 16px;
+  color: #999;
+  pointer-events: none;
 }
 
 .search-input {
   width: 200px;
   height: 32px;
-  padding: 0 12px;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
+  padding: 0 32px 0 12px;
+  border: none;
+  background: transparent;
   font-size: 14px;
+  outline: none;
+}
+
+.search-input::placeholder {
+  color: #999;
 }
 
 .icon-btn {
@@ -263,11 +433,23 @@ const show = ref(false)
   font-size: 18px;
 }
 
+.user-info-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
 .user-info {
   display: flex;
   align-items: center;
   gap: 8px;
   cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.user-info:hover {
+  background: #f5f7fa;
 }
 
 .avatar {
@@ -288,6 +470,148 @@ const show = ref(false)
 .dropdown-icon {
   font-size: 10px;
   color: #999;
+}
+
+/* 用户下拉菜单 */
+.user-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  min-width: 320px;
+  z-index: 1001;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+}
+
+.user-dropdown-menu.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  gap: 12px;
+  background: #f5f7fa;
+}
+
+.user-avatar-large {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.user-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.user-title {
+  font-size: 13px;
+  color: #666;
+}
+
+.user-dept {
+  font-size: 12px;
+  color: #999;
+}
+
+.user-menu-divider {
+  height: 1px;
+  background: #e0e0e0;
+  margin: 8px 0;
+}
+
+.user-menu-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  gap: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.user-menu-item:hover {
+  background: #f5f7fa;
+}
+
+.menu-icon {
+  font-size: 18px;
+  width: 24px;
+  text-align: center;
+}
+
+.menu-text {
+  flex: 1;
+  font-size: 14px;
+  color: #333;
+}
+
+.menu-value {
+  font-size: 13px;
+  color: #999;
+  margin-right: 4px;
+}
+
+.menu-arrow {
+  font-size: 16px;
+  color: #999;
+}
+
+/* 下拉菜单项样式 */
+.dropdown-item {
+  padding: 12px 20px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  transition: background 0.2s;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.dropdown-item:hover {
+  background: #f5f7fa;
+  color: #8b2332;
+}
+
+.dropdown-item.has-submenu {
+  position: relative;
+}
+
+.submenu-arrow {
+  font-size: 16px;
+  color: #999;
+  margin-left: 8px;
 }
 
 /* 主要内容区域 */
