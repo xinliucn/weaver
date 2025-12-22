@@ -131,6 +131,11 @@
               <text class="menu-arrow">›</text>
             </view>
             <view class="user-menu-divider"></view>
+            <view class="user-menu-item" @click="testCookieAPI">
+              <text class="menu-icon">🧪</text>
+              <text class="menu-text">Test Cookie API</text>
+            </view>
+            <view class="user-menu-divider"></view>
             <view class="user-menu-item" @click="handleLogout">
               <text class="menu-icon"><img :src="logoutIcon" class="avatar-image" alt="Logout Icon" /></text>
               <text class="menu-text">Logout</text>
@@ -288,6 +293,7 @@
 import { ref, onMounted } from 'vue'
 import { keycloak } from '../utils/keycloak'
 import { UserInfoManager } from '../../utils/userInfo'
+import { testCookieRequest } from '@/api/test'
 import logoImage from '@/assets/images/image002.jpg'
 import userInfoImage from '@/assets/images/icon_m_wev8.jpg'
 import bannerBgImage from '@/assets/images/BgGray.png'
@@ -328,6 +334,35 @@ const handleLogout = () => {
     keycloak.logout({
       redirectUri: window.location.origin + '/#/pages/login/index'
     })
+  }
+}
+
+// 测试 Cookie API
+const testCookieAPI = async () => {
+  try {
+    console.log('=== 测试 Cookie API ===')
+    console.log('Token:', keycloak.token)
+    console.log('Authenticated:', keycloak.authenticated)
+
+    const response = await testCookieRequest({ a: '1' })
+
+    console.log('✅ API 请求成功!')
+    console.log('响应数据:', response.data)
+
+    alert('API 测试成功！\n查看控制台获取详细信息')
+  } catch (error: any) {
+    console.error('❌ API 请求失败:', error)
+
+    if (error.response) {
+      console.error('响应状态:', error.response.status)
+      console.error('响应数据:', error.response.data)
+      alert(`API 测试失败！\n状态码: ${error.response.status}\n请查看控制台获取详细信息`)
+    } else {
+      alert(`API 测试失败！\n错误: ${error.message}`)
+    }
+  } finally {
+    // 关闭菜单
+    showUserMenu.value = false
   }
 }
 

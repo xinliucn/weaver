@@ -1,5 +1,4 @@
 import { keycloak } from '../pages/utils/keycloak'
-import { SecureStorage } from './secureStorage'
 
 /**
  * 用户信息接口
@@ -16,18 +15,16 @@ export interface UserInfo {
 
 /**
  * 用户信息管理工具
- * 结合Keycloak和加密存储
+ * 直接从 Keycloak 或后端 API 获取用户信息
+ * 依赖 cookies 进行认证
  */
 export class UserInfoManager {
-  private static STORAGE_KEY = 'user_info_cached'
-
   /**
-   * 从Keycloak加载用户信息
-   * 自动缓存到加密存储
+   * 从 Keycloak 加载用户信息
    */
   static async loadFromKeycloak(): Promise<UserInfo | null> {
     if (!keycloak || !keycloak.authenticated) {
-      console.warn('Keycloak未认证')
+      console.warn('Keycloak 未认证')
       return null
     }
 
@@ -49,14 +46,11 @@ export class UserInfoManager {
         roles: tokenParsed?.realm_access?.roles || []
       }
 
-      // 加密存储到SessionStorage（关闭浏览器后自动清除）
-      SecureStorage.setItem(this.STORAGE_KEY, userInfo, true)
-
       return userInfo
     } catch (error) {
       console.error('Failed to load user profile:', error)
 
-      // 如果loadUserProfile失败，使用token中的信息
+      // 如果 loadUserProfile 失败，使用 token 中的信息
       const tokenParsed = keycloak.tokenParsed
       if (tokenParsed) {
         const userInfo: UserInfo = {
@@ -67,9 +61,6 @@ export class UserInfoManager {
           roles: tokenParsed.realm_access?.roles || []
         }
 
-        // 加密存储
-        SecureStorage.setItem(this.STORAGE_KEY, userInfo, true)
-
         return userInfo
       }
 
@@ -78,23 +69,10 @@ export class UserInfoManager {
   }
 
   /**
-   * 从缓存读取用户信息（加密存储）
-   */
-  static getCached(): UserInfo | null {
-    return SecureStorage.getItem(this.STORAGE_KEY, true)
-  }
-
-  /**
-   * 获取用户信息（优先从缓存，缓存不存在则从Keycloak加载）
+   * 获取用户信息
+   * 每次都从 Keycloak 重新加载（依赖 cookies 认证）
    */
   static async getUserInfo(): Promise<UserInfo | null> {
-    // 先尝试从缓存读取
-    const cached = this.getCached()
-    if (cached) {
-      return cached
-    }
-
-    // 缓存不存在，从Keycloak加载
     return await this.loadFromKeycloak()
   }
 
@@ -106,17 +84,18 @@ export class UserInfoManager {
   }
 
   /**
-   * 清除缓存的用户信息
+   * 清除缓存（已移除加密存储，保留方法以兼容现有代码）
    */
   static clearCache(): void {
-    SecureStorage.removeItem(this.STORAGE_KEY, true)
+    // 不再使用本地存储，无需清除
+    console.log('用户信息不再使用本地缓存')
   }
 
   /**
    * 检查用户是否有特定角色
    */
-  static hasRole(role: string): boolean {
-    const userInfo = this.getCached()
+  static async hasRole(role: string): Promise<boolean> {
+    const userInfo = await this.getUserInfo()
     if (!userInfo || !userInfo.roles) {
       return false
     }
@@ -126,8 +105,8 @@ export class UserInfoManager {
   /**
    * 检查用户是否有任意一个角色
    */
-  static hasAnyRole(roles: string[]): boolean {
-    const userInfo = this.getCached()
+  static async hasAnyRole(roles: string[]): Promise<boolean> {
+    const userInfo = await this.getUserInfo()
     if (!userInfo || !userInfo.roles) {
       return false
     }
@@ -137,11 +116,12 @@ export class UserInfoManager {
   /**
    * 检查用户是否有所有角色
    */
-  static hasAllRoles(roles: string[]): boolean {
-    const userInfo = this.getCached()
+  static async hasAllRoles(roles: string[]): Promise<boolean> {
+    const userInfo = await this.getUserInfo()
     if (!userInfo || !userInfo.roles) {
       return false
     }
     return roles.every(role => userInfo.roles!.includes(role))
   }
 }
+
