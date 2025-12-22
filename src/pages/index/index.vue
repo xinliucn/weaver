@@ -84,20 +84,24 @@
       <view class="navbar-right">
         <view class="search-box">
           <input type="text" placeholder="Search" class="search-input" />
-           <text class="search-icon">🔍</text>
+           <text class="search-icon">
+            <img :src="seachIcon" class="input-icon" alt="search" />
+           </text>
         </view>
-        <view class="icon-btn">🔔</view>
-        <view class="icon-btn">🌐</view>
+        <view class="icon-btn"> <img :src="messageIcon" class="input-icon" alt="account" /></view>
+        <view class="icon-btn"><img :src="moreIcon" class="input-icon" alt="more" /></view>
         <view class="user-info-wrapper">
           <view class="user-info" @click="toggleUserMenu">
-            <view class="avatar">👤</view>
+            <view class="avatar">
+              <img :src="userInfoImage" class="avatar-image" alt="User Avatar" />
+            </view>
             <text class="username">{{ userInfo.name || userInfo.username || 'User' }}</text>
-            <text class="dropdown-icon">▼</text>
+            <img :src="showUserMenu ? arrowUpIcon : arrowDownIcon" class="dropdown-icon" alt="dropdown" />
           </view>
           <!-- 用户下拉菜单 -->
           <view :class="['user-dropdown-menu', { show: showUserMenu }]">
             <view class="user-profile">
-              <view class="user-avatar-large">👤</view>
+              <view class="user-avatar-large"><img :src="userInfoImage" class="avatar-image" alt="User Avatar" /></view>
               <view class="user-details">
                 <text class="user-name">{{ userInfo.name || userInfo.username || 'User' }}</text>
                 <text class="user-title">{{ userInfo.email || '' }}</text>
@@ -106,29 +110,29 @@
             </view>
             <view class="user-menu-divider"></view>
             <view class="user-menu-item">
-              <text class="menu-icon">🌐</text>
+              <text class="menu-icon"><img :src="earthIcon" class="avatar-image" alt="Earth Icon" /></text>
               <text class="menu-text">Language</text>
               <text class="menu-value">English</text>
               <text class="menu-arrow">›</text>
             </view>
             <view class="user-menu-item">
-              <text class="menu-icon">⚙️</text>
+              <text class="menu-icon"><img :src="settingsIcon" class="avatar-image" alt="Settings Icon" /></text>
               <text class="menu-text">Personalization</text>
               <text class="menu-arrow">›</text>
             </view>
             <view class="user-menu-item">
-              <text class="menu-icon">🔒</text>
+              <text class="menu-icon"><img :src="passwordIcon" class="avatar-image" alt="Password Icon" /></text>
               <text class="menu-text">Password Settings</text>
               <text class="menu-arrow">›</text>
             </view>
             <view class="user-menu-item">
-              <text class="menu-icon">🎨</text>
+              <text class="menu-icon"><img :src="topicIcon" class="avatar-image" alt="Topic Icon" /></text>
               <text class="menu-text">Theme Center</text>
               <text class="menu-arrow">›</text>
             </view>
             <view class="user-menu-divider"></view>
             <view class="user-menu-item" @click="handleLogout">
-              <text class="menu-icon">🚪</text>
+              <text class="menu-icon"><img :src="logoutIcon" class="avatar-image" alt="Logout Icon" /></text>
               <text class="menu-text">Logout</text>
             </view>
           </view>
@@ -284,8 +288,19 @@
 import { ref, onMounted } from 'vue'
 import { keycloak } from '../utils/keycloak'
 import { UserInfoManager } from '../../utils/userInfo'
-import logoImage from '../assets/images/image002.jpg'
-import bannerBgImage from '../assets/images/BgGray.png'
+import logoImage from '@/assets/images/image002.jpg'
+import userInfoImage from '@/assets/images/icon_m_wev8.jpg'
+import bannerBgImage from '@/assets/images/BgGray.png'
+import seachIcon from '@/assets/icons/seach.svg'
+import messageIcon from '@/assets/icons/message.svg'
+import moreIcon from '@/assets/icons/more.svg'
+import arrowDownIcon from '@/assets/icons/arrow down.svg'
+import arrowUpIcon from '@/assets/icons/arrow on.svg'
+import earthIcon from '@/assets/icons/earth-fill.svg'
+import topicIcon from '@/assets/icons/topic.svg'
+import passwordIcon from '@/assets/icons/password.svg'
+import settingsIcon from '@/assets/icons/settings.svg'
+import logoutIcon from '@/assets/icons/logout.svg'
 
 const show = ref(false)
 const activeTab = ref('workspace')
@@ -492,6 +507,13 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
+}
+
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .username {
@@ -500,8 +522,10 @@ onMounted(async () => {
 }
 
 .dropdown-icon {
-  font-size: 10px;
-  color: #999;
+  width: 12px;
+  height: 12px;
+  opacity: 0.6;
+  transition: transform 0.3s ease;
 }
 
 /* 用户下拉菜单 */

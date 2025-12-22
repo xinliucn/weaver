@@ -86,9 +86,9 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { keycloak, initKeycloak } from '@/pages/utils/keycloak'
-import logoImage from '../assets/images/image002.jpg'
-import accountIcon from '../assets/icons/account.svg'
-import passwordIcon from '../assets/icons/password.svg'
+import logoImage from '@/assets/images/image002.jpg'
+import accountIcon from '@/assets/icons/account.svg'
+import passwordIcon from '@/assets/icons/password.svg'
 
 interface UserInfo {
   preferred_username?: string

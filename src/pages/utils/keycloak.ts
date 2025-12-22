@@ -1,9 +1,10 @@
 import Keycloak from "keycloak-js"
+import env from '@/config/env'
 
 const keycloak = new Keycloak({
-  url: "https://ssosit.dch-ecomplatform.com",
-  realm: "weaver",
-  clientId: "vue-spa",
+  url: env.keycloak.url,
+  realm: env.keycloak.realm,
+  clientId: env.keycloak.clientId,
 });
 
 let isInitialized = false
