@@ -133,7 +133,7 @@ const handleSSOLogin = async () => {
 // }
 
     // 2. 跳转到后端返回的授权 URL
-    if (response.authorization_url) {
+    if (response.data.authorization_url) {
       console.log('🔄 跳转到 Keycloak 授权页面:', response.data.authorization_url)
       window.location.href = response.data.authorization_url
     } else {
