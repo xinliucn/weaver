@@ -127,12 +127,15 @@ const handleSSOLogin = async () => {
 
     const response = await initiateLogin()
 
-    console.log('✅ 收到后端响应:', response.data)
+    console.log('✅ 收到后端响应:', response)
+//     {
+//     "authorization_url": "https://ssosit.dch-ecomplatform.com/realms/weaver/protocol/openid-connect/auth?client_id=vue-bff&am…
+// }
 
     // 2. 跳转到后端返回的授权 URL
-    if (response.data.auth_url) {
-      console.log('🔄 跳转到 Keycloak 授权页面:', response.data.auth_url)
-      window.location.href = response.data.auth_url
+    if (response.authorization_url) {
+      console.log('🔄 跳转到 Keycloak 授权页面:', response.authorization_url)
+      window.location.href = response.authorization_url
     } else {
       throw new Error('后端未返回授权 URL')
     }
