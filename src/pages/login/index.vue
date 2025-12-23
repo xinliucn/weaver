@@ -85,26 +85,16 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import { keycloak, initKeycloak } from '@/pages/utils/keycloak'
+import { initiateLogin } from '@/api/auth'
 import logoImage from '@/assets/images/image002.jpg'
 import accountIcon from '@/assets/icons/account.svg'
 import passwordIcon from '@/assets/icons/password.svg'
-
-interface UserInfo {
-  preferred_username?: string
-  email?: string
-  name?: string
-  sub?: string
-}
 
 const username = ref('')
 const password = ref('')
 const rememberUsername = ref(false)
 const rememberPassword = ref(false)
-const isAuthenticated = ref(false)
 const isLoading = ref(false)
-const userInfo = ref<UserInfo | null>(null)
-let checkInterval: NodeJS.Timeout | null = null
 
 const toast = ref({
   visible: false,
@@ -125,57 +115,47 @@ const handleLogin = () => {
   handleSSOLogin()
 }
 
-// SSO 登录
+// SSO 登录 - 方案 B：调用后端 API
 const handleSSOLogin = async () => {
-  console.log('handleSSOLogin called')
+  console.log('🔐 开始 SSO 登录流程（方案 B）')
+  isLoading.value = true
 
   try {
-    if (!keycloak.didInitialize) {
-      console.log('Initializing keycloak...')
-      await keycloak.init({
-        checkLoginIframe: false,
-        pkceMethod: 'S256',
-        flow: 'standard',
-      })
-      console.log('Keycloak initialized')
+    // 1. 调用后端 API 获取授权 URL
+    const redirectUri = `${window.location.protocol}//${window.location.host}/`
+    console.log('📤 调用后端 /api/auth/login，redirect_uri:', redirectUri)
+
+    const response = await initiateLogin()
+
+    console.log('✅ 收到后端响应:', response.data)
+
+    // 2. 跳转到后端返回的授权 URL
+    if (response.data.auth_url) {
+      console.log('🔄 跳转到 Keycloak 授权页面:', response.data.auth_url)
+      window.location.href = response.data.auth_url
+    } else {
+      throw new Error('后端未返回授权 URL')
     }
+  } catch (error: any) {
+    console.error('❌ 登录失败:', error)
+    isLoading.value = false
 
-    console.log('Calling keycloak.login...')
-    keycloak.login({
-      redirectUri: `${window.location.protocol}//${window.location.host}/`,
-      idpHint: 'oidc'
-    })
-  } catch (error) {
-    console.error('登录失败:', error)
-    showToast('登录失败，请重试', 'fail')
+    if (error.response) {
+      showToast(`登录失败: ${error.response.data?.message || '服务器错误'}`, 'fail')
+    } else if (error.request) {
+      showToast('网络错误，请检查后端服务是否启动', 'fail')
+    } else {
+      showToast(`登录失败: ${error.message}`, 'fail')
+    }
   }
 }
 
-// 检查认证状态
-const checkAuth = () => {
-  isAuthenticated.value = keycloak.authenticated || false
-
-  if (isAuthenticated.value && keycloak.tokenParsed) {
-    userInfo.value = keycloak.tokenParsed as UserInfo
-    showToast('登录成功！', 'success')
-  }
-}
-
-onMounted(async () => {
-  try {
-    await initKeycloak((token: string) => {
-      console.log('Token ready:', token)
-    })
-  } catch (error) {
-    console.error('Keycloak 初始化失败:', error)
-  }
-  checkAuth()
+onMounted(() => {
+  handleSSOLogin()
 })
 
 onUnmounted(() => {
-  if (checkInterval) {
-    clearInterval(checkInterval)
-  }
+  // 清理工作
 })
 </script>
 

@@ -1,41 +1,21 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
-import { keycloak } from '@/pages/utils/keycloak'
 import env from '@/config/env'
 
 // 创建 axios 实例
 const request: AxiosInstance = axios.create({
   baseURL: env.apiBaseUrl, // 从环境变量读取 API 基础地址
   timeout: 30000, // 请求超时时间 30秒
-  withCredentials: true, // 跨域请求时携带 cookies
+  withCredentials: true, // ⭐ 关键！跨域请求时自动携带 cookies
   headers: {
     'Content-Type': 'application/json',
   },
 })
 
-// 请求拦截器 - 自动添加 Token
+// 请求拦截器 - Cookie 会自动携带，不需要手动处理
 request.interceptors.request.use(
-  async (config) => {
-    // 如果 Keycloak 已认证，自动添加 token
-    if (keycloak.authenticated && keycloak.token) {
-      // 检查 token 是否即将过期（30秒内），如果是则刷新
-      if (keycloak.isTokenExpired(30)) {
-        try {
-          const refreshed = await keycloak.updateToken(30)
-          if (refreshed) {
-            console.log('Token 已刷新')
-          }
-        } catch (error) {
-          console.error('Token 刷新失败:', error)
-          // Token 刷新失败，可能需要重新登录
-          keycloak.login()
-          return Promise.reject(new Error('Token 刷新失败'))
-        }
-      }
-
-      // 添加 Authorization header
-      config.headers.Authorization = `Bearer ${keycloak.token}`
-    }
-
+  (config) => {
+    console.log('📤 发送请求:', config.method?.toUpperCase(), config.url)
+    // Cookie（session_id）会被浏览器自动添加到请求头中
     return config
   },
   (error) => {
@@ -58,45 +38,32 @@ request.interceptors.response.use(
 
       switch (status) {
         case 401:
-          // 未授权 - Token 可能过期或无效
-          console.error('401 未授权 - 尝试刷新 token')
-          try {
-            const refreshed = await keycloak.updateToken(5)
-            if (refreshed && error.config) {
-              // Token 刷新成功，重试原请求
-              error.config.headers.Authorization = `Bearer ${keycloak.token}`
-              return request(error.config)
-            } else {
-              // 刷新失败，跳转登录
-              keycloak.login()
-            }
-          } catch (refreshError) {
-            console.error('Token 刷新失败:', refreshError)
-            keycloak.login()
-          }
+          // 未授权 - Session 已过期或无效，跳转登录页
+          console.error('❌ 401 未授权 - Session 已过期，跳转登录页')
+          window.location.href = '/#/pages/login/index'
           break
 
         case 403:
-          console.error('403 禁止访问 - 权限不足')
+          console.error('❌ 403 禁止访问 - 权限不足')
           break
 
         case 404:
-          console.error('404 资源不存在')
+          console.error('❌ 404 资源不存在')
           break
 
         case 500:
-          console.error('500 服务器错误')
+          console.error('❌ 500 服务器错误')
           break
 
         default:
-          console.error(`请求失败: ${status}`)
+          console.error(`❌ 请求失败: ${status}`)
       }
     } else if (error.request) {
       // 请求已发出，但没有收到响应
-      console.error('网络错误 - 无响应:', error.request)
+      console.error('❌ 网络错误 - 无响应:', error.request)
     } else {
       // 发送请求时出了问题
-      console.error('请求配置错误:', error.message)
+      console.error('❌ 请求配置错误:', error.message)
     }
 
     return Promise.reject(error)

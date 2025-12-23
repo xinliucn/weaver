@@ -1,7 +1,6 @@
 import { createApp } from 'vue'
 import NutUI from '@nutui/nutui-taro'
 import '@nutui/nutui-taro/dist/style.css'
-import { keycloak, initKeycloak } from '@/pages/utils/keycloak'
 import { registerSW } from 'virtual:pwa-register'
 import './app.css'
 
@@ -17,12 +16,10 @@ const updateSW = registerSW({
 
 const App = createApp({
   onLaunch() {
-    // 在应用启动时初始化 Keycloak
-    initKeycloak((token: string) => {
-      console.log('Token ready:', token)
-    }).catch(err => {
-      console.error('Keycloak init failed:', err)
-    })
+    console.log('🚀 应用启动')
+    // 使用方案 B（后端 Session + Cookie）
+    // 不需要在前端初始化 Keycloak
+    // 认证完全由后端处理
   },
   onShow() {
     // 应用显示时不需要额外操作
@@ -31,8 +28,5 @@ const App = createApp({
 })
 
 App.use(NutUI)
-
-// 将 keycloak 实例挂载到全局属性上,方便在组件中使用
-App.config.globalProperties.$keycloak = keycloak
 
 export default App

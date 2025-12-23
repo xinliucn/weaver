@@ -291,8 +291,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { keycloak } from '../utils/keycloak'
-import { UserInfoManager } from '../../utils/userInfo'
+import { getCurrentUser, logout } from '@/api/auth'
 import { testCookieRequest } from '@/api/test'
 import logoImage from '@/assets/images/image002.jpg'
 import userInfoImage from '@/assets/images/icon_m_wev8.jpg'
@@ -325,15 +324,19 @@ const toggleUserMenu = () => {
   showUserMenu.value = !showUserMenu.value
 }
 
-// 处理登出
-const handleLogout = () => {
-  if (keycloak) {
-    // 清除用户信息缓存
-    UserInfoManager.clearCache()
-    // 登出
-    keycloak.logout({
-      redirectUri: window.location.origin + '/#/pages/login/index'
-    })
+// 处理登出 - 方案 B：调用后端登出接口
+const handleLogout = async () => {
+  try {
+    console.log('🚪 调用后端登出接口')
+    await logout()
+
+    console.log('✅ 登出成功，跳转到登录页')
+    // 跳转到登录页
+    window.location.href = '/#/pages/login/index'
+  } catch (error) {
+    console.error('❌ 登出失败:', error)
+    // 即使失败也跳转到登录页
+    window.location.href = '/#/pages/login/index'
   }
 }
 
@@ -341,8 +344,7 @@ const handleLogout = () => {
 const testCookieAPI = async () => {
   try {
     console.log('=== 测试 Cookie API ===')
-    console.log('Token:', keycloak.token)
-    console.log('Authenticated:', keycloak.authenticated)
+    console.log('💡 方案 B：浏览器会自动携带 session_id Cookie')
 
     const response = await testCookieRequest({ a: '1' })
 
@@ -366,12 +368,30 @@ const testCookieAPI = async () => {
   }
 }
 
-// 从Keycloak加载用户信息
+// 从后端获取用户信息 - 方案 B
 onMounted(async () => {
-  if (keycloak && keycloak.authenticated) {
-    const info = await UserInfoManager.getUserInfo()
-    if (info) {
-      userInfo.value = info
+  try {
+    console.log('📱 首页加载，获取用户信息...')
+    console.log('💡 方案 B：调用后端 API，后端验证 session_id Cookie')
+
+    const response = await getCurrentUser()
+
+    if (response.data) {
+      userInfo.value = {
+        username: response.data.username || '',
+        name: response.data.name || response.data.preferred_username || '',
+        email: response.data.email || '',
+        preferredUsername: response.data.preferred_username || ''
+      }
+      console.log('✅ 用户信息加载成功:', userInfo.value)
+    }
+  } catch (error: any) {
+    console.error('❌ 获取用户信息失败:', error)
+
+    // 如果是 401 错误，说明未登录或 session 过期，跳转到登录页
+    if (error.response?.status === 401) {
+      console.log('🔄 未登录或 Session 过期，跳转到登录页')
+      window.location.href = '/#/pages/login/index'
     }
   }
 })
