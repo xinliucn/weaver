@@ -1,6 +1,6 @@
 import Taro from '@tarojs/taro'
 import { SecureStorage } from './secureStorage'
-import { keycloak } from '../pages/utils/keycloak'
+import { keycloak } from './keycloak'
 
 /**
  * 带加密的API请求工具

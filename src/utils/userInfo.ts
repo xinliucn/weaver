@@ -1,4 +1,4 @@
-import { keycloak } from '../pages/utils/keycloak'
+import { keycloak } from './keycloak'
 
 /**
  * 用户信息接口

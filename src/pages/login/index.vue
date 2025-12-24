@@ -3,11 +3,7 @@
     <view class="login-container">
       <!-- Logo and Title -->
       <view class="login-header">
-        <img
-          class="login-logo"
-          :src="logoImage"
-          alt="DCH Logo"
-        />
+        <img class="login-logo" :src="logoImage" alt="DCH Logo" />
         <view class="subtitle">New ePortal Experience</view>
         <view class="language">English</view>
       </view>
@@ -15,11 +11,7 @@
       <!-- Login Form -->
       <view class="login-form">
         <view class="input-group">
-          <nut-input
-            v-model="username"
-            placeholder="Account /Employee No. /Mobile /Email"
-            class="custom-input"
-          >
+          <nut-input v-model="username" placeholder="Account /Employee No. /Mobile /Email" class="custom-input">
             <template #left>
               <img :src="accountIcon" class="input-icon" alt="account" />
             </template>
@@ -27,12 +19,7 @@
         </view>
 
         <view class="input-group">
-          <nut-input
-            v-model="password"
-            type="password"
-            placeholder="Password"
-            class="custom-input"
-          >
+          <nut-input v-model="password" type="password" placeholder="Password" class="custom-input">
             <template #left>
               <img :src="passwordIcon" class="input-icon" alt="password" />
             </template>
@@ -55,37 +42,24 @@
         </view>
 
         <view class="button-group">
-          <nut-button
-            type="primary"
-            class="login-btn"
-            @click="handleLogin"
-            :loading="isLoading"
-          >
+          <nut-button type="primary" class="login-btn" @click="handleLogin" :loading="isLoading">
             Login
           </nut-button>
 
-          <nut-button
-            type="primary"
-            class="sso-btn"
-            @click="handleSSOLogin"
-          >
+          <nut-button type="primary" class="sso-btn" @click="handleSSOLogin">
             SSO Login
           </nut-button>
         </view>
       </view>
     </view>
 
-    <nut-toast
-      v-model:visible="toast.visible"
-      :msg="toast.msg"
-      :type="toast.type"
-    />
+    <nut-toast v-model:visible="toast.visible" :msg="toast.msg" :type="toast.type" />
   </view>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import { initiateLogin } from '@/api/auth'
+import { initiateLogin, getCurrentUser } from '@/api/auth'
 import logoImage from '@/assets/images/image002.jpg'
 import accountIcon from '@/assets/icons/account.svg'
 import passwordIcon from '@/assets/icons/password.svg'
@@ -128,9 +102,9 @@ const handleSSOLogin = async () => {
     const response = await initiateLogin()
 
     console.log('✅ 收到后端响应:', response.data)
-//     {
-//     "authorization_url": "https://ssosit.dch-ecomplatform.com/realms/weaver/protocol/openid-connect/auth?client_id=vue-bff&am…
-// }
+    // {
+    //     "authorization_url": "https://ssosit.dch-ecomplatform.com/realms/weaver/protocol/openid-connect/auth?client_id=vue-bff&am…
+    // }
 
     // 2. 跳转到后端返回的授权 URL
     if (response.data.authorization_url) {
@@ -153,8 +127,37 @@ const handleSSOLogin = async () => {
   }
 }
 
-onMounted(() => {
+// 检查是否已有 session_id，避免无限重定向
+const checkSessionAndLogin = async () => {
+  // 1. 检查 Cookie 中是否存在 session_id
+  const hasSessionId = document.cookie.split(';').some(cookie =>
+    cookie.trim().startsWith('session_id=')
+  )
+
+  if (hasSessionId) {
+    console.log('🔍 检测到 session_id，尝试验证会话')
+    try {
+      // 验证 session 是否有效
+      // const response = await getCurrentUser()
+      // if (response.data) {
+      //   console.log('✅ Session 有效，跳转到首页')
+      window.location.href = '/#/pages/index/index'
+      return
+      // }
+    } catch (error) {
+      console.log('⚠️ Session 无效或已过期，清理 Cookie 后重新登录')
+      // Session 无效，清理 Cookie
+      document.cookie = 'session_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'
+    }
+  }
+
+  // 2. 没有 session_id 或 session 无效，触发 SSO 登录
+  console.log('🔐 没有有效 session，开始 SSO 登录流程')
   handleSSOLogin()
+}
+
+onMounted(() => {
+  checkSessionAndLogin()
 })
 
 onUnmounted(() => {
@@ -273,7 +276,7 @@ onUnmounted(() => {
   font-weight: bold;
   line-height: 1;
 }
-  
+
 
 .button-group {
   display: flex;
