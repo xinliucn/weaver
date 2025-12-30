@@ -20,7 +20,8 @@ export const initiateLogin = () => {
  * 后端会验证 session_id Cookie，从 Redis 获取 Token，返回用户信息
  */
 export const getCurrentUser = () => {
-  return request.get('https://windmill-uat.dchbi.app/api/auth/user')
+  // return request.get('https://windmill-uat.dchbi.app/api/r/weaver/auth')
+  return request.post ('https://windmill-uat.dchbi.app/api/w/internal/jobs/run_wait_result/p/f/weaver/auth_verify_post')
 }
 
 /**

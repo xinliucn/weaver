@@ -91,22 +91,12 @@ const handleLogin = () => {
 
 // SSO 登录 - 方案 B：调用后端 API
 const handleSSOLogin = async () => {
-  console.log('🔐 开始 SSO 登录流程（方案 B）')
   isLoading.value = true
 
   try {
     // 1. 调用后端 API 获取授权 URL
-    const redirectUri = `${window.location.protocol}//${window.location.host}/`
-    console.log('📤 调用后端 /api/auth/login，redirect_uri:', redirectUri)
-
     const response = await initiateLogin()
 
-    console.log('✅ 收到后端响应:', response.data)
-    // {
-    //     "authorization_url": "https://ssosit.dch-ecomplatform.com/realms/weaver/protocol/openid-connect/auth?client_id=vue-bff&am…
-    // }
-
-    // 2. 跳转到后端返回的授权 URL
     if (response.data.authorization_url) {
       console.log('🔄 跳转到 Keycloak 授权页面:', response.data.authorization_url)
       window.location.href = response.data.authorization_url
@@ -129,31 +119,18 @@ const handleSSOLogin = async () => {
 
 // 检查是否已有 session_id，避免无限重定向
 const checkSessionAndLogin = async () => {
-  // 1. 检查 Cookie 中是否存在 session_id
-  const hasSessionId = document.cookie.split(';').some(cookie =>
-    cookie.trim().startsWith('session_id=')
-  )
-
-  if (hasSessionId) {
-    console.log('🔍 检测到 session_id，尝试验证会话')
-    try {
-      // 验证 session 是否有效
-      // const response = await getCurrentUser()
-      // if (response.data) {
-      //   console.log('✅ Session 有效，跳转到首页')
-      window.location.href = '/#/pages/index/index'
-      return
-      // }
-    } catch (error) {
-      console.log('⚠️ Session 无效或已过期，清理 Cookie 后重新登录')
-      // Session 无效，清理 Cookie
-      document.cookie = 'session_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'
-    }
+  // 1. 调用身份验证接口，检查是否已有有效会话
+  const userResponse = await getCurrentUser()
+  if (userResponse) {
+    console.log('✅ 已有有效会话，用户信息:', userResponse.data)
+    // 这里可以直接跳转到应用的主页面
+    // window.location.href = '/dashboard' // 替换为你的主页面路径
+    return
+  }else {
+    console.log('🔄 无有效会话，继续登录流程')
+    handleSSOLogin()
   }
-
-  // 2. 没有 session_id 或 session 无效，触发 SSO 登录
-  console.log('🔐 没有有效 session，开始 SSO 登录流程')
-  handleSSOLogin()
+  
 }
 
 onMounted(() => {
