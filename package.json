@@ -27,7 +27,7 @@
     "dev:qq": "npm run build:qq -- --watch",
     "dev:quickapp": "npm run build:quickapp -- --watch",
     "preview:h5": "yarn build:h5 && http-server dist -p 5173 -S -C certs/server.crt -K certs/server.key -a superapp.dchbi.app -o",
-    "preview:h5:watch": "nodemon --watch src --ext ts,tsx,vue,js,jsx,css,scss --exec 'yarn build:h5 && http-server dist -p 5173 -S -C certs/server.crt -K certs/server.key -a superapp.dchbi.app'"
+    "preview:h5:watch": "nodemon --watch src --ext ts,tsx,vue,js,jsx,css,scss --exec \"npm run build:h5 && http-server dist -p 5173 -S -C certs/server.crt -K certs/server.key -a 127.0.0.1\""
   },
   "browserslist": [
     "last 3 versions",
