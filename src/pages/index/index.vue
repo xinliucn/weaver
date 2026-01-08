@@ -322,14 +322,15 @@ const toggleUserMenu = () => {
 // 处理登出 - 方案 B：调用后端登出接口
 const handleLogout = async () => {
   try {
-    console.log('🚪 调用后端登出接口')
     const res = await logout()
-
-    console.log('✅ 登出成功，跳转到登录页',res)
-    // 跳转到登录页
-    // Taro.navigateTo({
-    //   url: '/pages/login/index'
-    // })
+    res.data.code == 1 &&  Taro.navigateTo({
+      url: '/pages/login/index'
+    })
+    res.data.code != 1 &&  Taro.showToast({
+      title: '登出失败，请稍后重试',
+      icon: 'error',
+      duration: 2000
+    })
   } catch (error) {
     console.error('❌ 登出失败:', error)
     Taro.navigateTo({
