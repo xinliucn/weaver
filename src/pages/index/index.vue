@@ -323,13 +323,13 @@ const toggleUserMenu = () => {
 const handleLogout = async () => {
   try {
     console.log('🚪 调用后端登出接口')
-    await logout()
+    const res = await logout()
 
-    console.log('✅ 登出成功，跳转到登录页')
+    console.log('✅ 登出成功，跳转到登录页',res)
     // 跳转到登录页
-    Taro.navigateTo({
-      url: '/pages/login/index'
-    })
+    // Taro.navigateTo({
+    //   url: '/pages/login/index'
+    // })
   } catch (error) {
     console.error('❌ 登出失败:', error)
     Taro.navigateTo({
