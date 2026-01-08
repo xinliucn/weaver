@@ -1,0 +1,35 @@
+# 依赖目录
+node_modules
+npm-debug.log
+yarn-error.log
+package-lock.json
+
+# 构建产物
+dist
+.swc
+
+# Git
+.git
+.gitignore
+
+# 环境变量文件
+.env
+.env.*
+
+# IDE 配置
+.vscode
+.idea
+.DS_Store
+.claude
+
+# 文档
+docs
+README.md
+
+# 证书文件
+certs
+
+# 其他
+*.log
+.editorconfig
+.eslintrc

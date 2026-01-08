@@ -1,0 +1,18 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+	ignorecase = true
+	precomposeunicode = true
+[remote "origin"]
+	url = git@github.com:xinliucn/weaver.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "main"]
+	remote = origin
+	merge = refs/heads/main
+	gk-last-accessed = 2026-01-05T09:43:16.156Z
+	gk-last-modified = 2026-01-05T09:43:16.156Z
+[remote "az"]
+	url = git@ssh.dev.azure.com:v3/dch-holdings/Superapp/Superapp
+	fetch = +refs/heads/*:refs/remotes/az/*
