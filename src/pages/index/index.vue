@@ -279,7 +279,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { getCurrentUser, logout } from '@/api/auth'
-import { getBannerImages } from '@/api/content'
+import { getCmsdata } from '@/api/content'
 import Taro from '@tarojs/taro'
 import logoImage from '@/assets/images/image002.jpg'
 import userInfoImage from '@/assets/images/icon_m_wev8.jpg'
@@ -345,9 +345,19 @@ const handleLogout = async () => {
 // 获取首页轮播数据
 const loadBannerImages = async () => {
   try {
-    const response = await getBannerImages()
-    if (response.data.code == 1) {
-      bannerList.value = response.data.banners
+    const query = `{
+      listSuperAppBanners {
+        data {
+          id
+          Sort
+          imageUrl
+          imageUpload
+        }
+      }
+    }`
+    const response = await getCmsdata(query)
+    if (response.data.data?.listSuperAppBanners?.data) {
+      bannerList.value = response.data.data.listSuperAppBanners.data
     }
   } catch (error) {
     console.error('❌ 获取轮播图失败:', error)
