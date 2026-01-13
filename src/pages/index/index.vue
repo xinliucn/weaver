@@ -6,10 +6,7 @@
         <img :src="logoImage" class="logo" alt="DCH Logo" />
         <view class="nav-menu">
           <view class="nav-item-wrapper">
-            <text
-              :class="['nav-item', { active: activeTab === 'workspace' }]"
-              @click="activeTab = 'workspace'"
-            >
+            <text :class="['nav-item', { active: activeTab === 'workspace' }]" @click="activeTab = 'workspace'">
               Workspace
             </text>
             <!-- Workspace 下拉菜单 -->
@@ -22,10 +19,7 @@
           </view>
 
           <view class="nav-item-wrapper">
-            <text
-              :class="['nav-item', { active: activeTab === 'applications' }]"
-              @click="activeTab = 'applications'"
-            >
+            <text :class="['nav-item', { active: activeTab === 'applications' }]" @click="activeTab = 'applications'">
               My Applications
             </text>
             <!-- My Applications 下拉菜单 -->
@@ -84,9 +78,9 @@
       <view class="navbar-right">
         <view class="search-box">
           <input type="text" placeholder="Search" class="search-input" />
-           <text class="search-icon">
+          <text class="search-icon">
             <img :src="seachIcon" class="input-icon" alt="search" />
-           </text>
+          </text>
         </view>
         <view class="icon-btn"> <img :src="messageIcon" class="input-icon" alt="account" /></view>
         <view class="icon-btn"><img :src="moreIcon" class="input-icon" alt="more" /></view>
@@ -145,13 +139,11 @@
       <!-- 左侧内容 -->
       <view class="content-left">
         <!-- Banner -->
-        <view class="banner">
-          <view class="banner-text">
-            <text class="banner-title">大昌行家書</text>
-            <text class="banner-subtitle">ETTER TO DCH</text>
-          </view>
-          <img :src="bannerBgImage" class="banner-image" />
-        </view>
+        <swiper class="banner" :autoplay="true" :interval="5000" :circular="true" :indicator-dots="true">
+          <swiper-item v-for="(banner, index) in bannerList" :key="banner.id">
+            <img :src="banner.imageUrl || banner.imageUpload" class="banner-image" />
+          </swiper-item>
+        </swiper>
 
         <!-- 任务列表 -->
         <view class="tasks-section">
@@ -181,33 +173,33 @@
             <text class="widget-title">Quick Access</text>
           </view>
           <view class="quick-access-grid">
+            <view class="access-item" @click="openMiniApp('https://43.132.182.225/wui/cas-entrance.jsp?path=https://43.132.182.225/mobilemode/mobile/view.html?appid=1', 'GLC Portal')">
+              <view class="access-icon">🏛️</view>
+              <text class="access-label">GLC Portal</text>
+            </view>
+            <view class="access-item" @click="openMiniApp('https://43.132.182.225/wui/cas-entrance.jsp?path=https://43.132.182.225/mobilemode/mobile/view.html?appHomepageId=4', 'CCA 手機申請')">
+              <view class="access-icon">📝</view>
+              <text class="access-label">CCA 手機申請</text>
+            </view>
+            <view class="access-item" @click="openMiniApp('https://43.132.182.225/wui/cas-entrance.jsp?path=https://43.132.182.225/mobilemode/mobile/view.html?appHomepageId=3', 'CCA 審批/查看')">
+              <view class="access-icon">✅</view>
+              <text class="access-label">CCA 審批/查看</text>
+            </view>
+            <view class="access-item" @click="openMiniApp('https://43.132.182.225/wui/cas-entrance.jsp?path=https://43.132.182.225/mobilemode/mobile/view.html?appHomepageId=2', 'CCA 合同列表')">
+              <view class="access-icon">📋</view>
+              <text class="access-label">CCA 合同列表</text>
+            </view>
             <view class="access-item">
               <view class="access-icon">📧</view>
               <text class="access-label">Letter to DCH</text>
-            </view>
-            <view class="access-item">
-              <view class="access-icon">🔗</view>
-              <text class="access-label">DCH Connect</text>
             </view>
             <view class="access-item">
               <view class="access-icon">💻</view>
               <text class="access-label">ePortal</text>
             </view>
             <view class="access-item">
-              <view class="access-icon">🛠️</view>
-              <text class="access-label">IT Service Desk</text>
-            </view>
-            <view class="access-item">
               <view class="access-icon">📊</view>
               <text class="access-label">Group HRMS</text>
-            </view>
-            <view class="access-item">
-              <view class="access-icon">📚</view>
-              <text class="access-label">eLearning</text>
-            </view>
-            <view class="access-item">
-              <view class="access-icon">🌐</view>
-              <text class="access-label">Intranet</text>
             </view>
           </view>
         </view>
@@ -287,10 +279,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { getCurrentUser, logout } from '@/api/auth'
+import { getBannerImages } from '@/api/content'
 import Taro from '@tarojs/taro'
 import logoImage from '@/assets/images/image002.jpg'
 import userInfoImage from '@/assets/images/icon_m_wev8.jpg'
-import bannerBgImage from '@/assets/images/BgGray.png'
 import seachIcon from '@/assets/icons/seach.svg'
 import messageIcon from '@/assets/icons/message.svg'
 import moreIcon from '@/assets/icons/more.svg'
@@ -306,6 +298,14 @@ const show = ref(false)
 const activeTab = ref('workspace')
 const showUserMenu = ref(false)
 
+// Banner 轮播图片列表
+interface BannerItem {
+  id: string
+  imageUrl?: string
+  imageUpload?: string
+}
+const bannerList = ref<BannerItem[]>([])
+
 // 用户信息
 const userInfo = ref({
   username: '',
@@ -319,15 +319,38 @@ const toggleUserMenu = () => {
   showUserMenu.value = !showUserMenu.value
 }
 
+// 打开 MiniApp
+const openMiniApp = (url: string, title: string) => {
+  console.log('🚀 打开 MiniApp:', url, title)
+  const encodedUrl = encodeURIComponent(url)
+  const encodedTitle = encodeURIComponent(title)
+  const targetUrl = `/pages/miniapp/index?url=${encodedUrl}&title=${encodedTitle}`
+  Taro.navigateTo({
+    url: targetUrl
+  })
+}
+
 // 处理登出 - 方案 B：调用后端登出接口
 const handleLogout = async () => {
   try {
     const response = await logout()
-    if(response.data.code==1){
-      response.data.logout_uri&&(window.location.href = response.data.logout_uri)
+    if (response.data.code == 1) {
+      response.data.logout_url && (window.location.href = response.data.logout_url)
     }
   } catch (error) {
     console.error('❌ 登出失败:', error)
+  }
+}
+
+// 获取首页轮播数据
+const loadBannerImages = async () => {
+  try {
+    const response = await getBannerImages()
+    if (response.data.code == 1) {
+      bannerList.value = response.data.banners
+    }
+  } catch (error) {
+    console.error('❌ 获取轮播图失败:', error)
   }
 }
 
@@ -335,28 +358,26 @@ const handleLogout = async () => {
 // 从后端获取用户信息 - 方案 B
 onMounted(async () => {
   try {
-    console.log('📱 首页加载，获取用户信息...')
-    console.log('💡 方案 B：调用后端 API，后端验证 session_id Cookie')
-
     const response = await getCurrentUser()
 
-    if (response.data) {
+    if (response.data.code == 1) {
       userInfo.value = {
-        username: response.data.username || '',
-        name: response.data.name || response.data.preferred_username || '',
-        email: response.data.email || '',
-        preferredUsername: response.data.preferred_username || ''
+        username: response.data.user.name || '',
+        name: response.data.user.name || '',
+        email: response.data.user.username || '',
+        preferredUsername: response.data.user.name || ''
       }
-      console.log('✅ 用户信息加载成功:', userInfo.value)
+      loadBannerImages()
+    } else {
+      Taro.navigateTo({
+        url: '/pages/login/index'
+      })
     }
   } catch (error: any) {
-    console.error('❌ 获取用户信息失败:', error)
-
     // 如果是 401 错误，说明未登录或 session 过期，跳转到登录页
-    if (error.response?.status === 401) {
-      console.log('🔄 未登录或 Session 过期，跳转到登录页')
-      window.location.href = '/#/pages/login/index'
-    }
+    Taro.navigateTo({
+      url: '/pages/login/index'
+    })
   }
 })
 </script>
@@ -713,43 +734,81 @@ onMounted(async () => {
 /* Banner */
 .banner {
   height: 300px;
-  background: linear-gradient(135deg, #3a1a1f 0%, #8b2332 100%);
   border-radius: 8px;
   overflow: hidden;
-  position: relative;
-  display: flex;
-  align-items: center;
-  padding: 40px;
   margin-bottom: 24px;
 }
 
-.banner-text {
-  position: relative;
-  z-index: 2;
+swiper-item {
+  height: 100%;
 }
 
-.banner-title {
-  display: block;
-  font-size: 48px;
-  font-weight: bold;
-  color: white;
-  margin-bottom: 8px;
+/* MiniApp Section */
+.miniapp-section {
+  margin-bottom: 24px;
 }
 
-.banner-subtitle {
-  display: block;
-  font-size: 24px;
-  color: rgba(255, 255, 255, 0.9);
+.section-header {
+  margin-bottom: 16px;
 }
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.miniapp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.miniapp-card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: 1px solid #e0e0e0;
+}
+
+.miniapp-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  border-color: #a52a3a;
+}
+
+.miniapp-icon {
+  font-size: 36px;
+  margin-right: 16px;
+}
+
+.miniapp-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.miniapp-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.miniapp-desc {
+  font-size: 13px;
+  color: #666;
+}
+
 
 .banner-image {
-  position: absolute;
-  right: 0;
-  top: 0;
+  width: 100%;
   height: 100%;
-  width: 50%;
   object-fit: cover;
-  opacity: 0.3;
 }
 
 /* 任务列表 */
