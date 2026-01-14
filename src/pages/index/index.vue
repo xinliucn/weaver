@@ -367,7 +367,7 @@ const loadBannerImages = async () => {
     // }
     const response = await getBanners()
     if (response.data.code == 1) {
-      bannerList.value = response.data.data.banner
+      bannerList.value = response.data.data.banners
     }
   } catch (error) {
     console.error('❌ 获取轮播图失败:', error)
