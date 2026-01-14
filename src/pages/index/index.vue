@@ -139,11 +139,17 @@
       <!-- 左侧内容 -->
       <view class="content-left">
         <!-- Banner -->
-        <swiper class="banner" :autoplay="true" :interval="5000" :circular="true" :indicator-dots="true">
+        <swiper v-if="bannerList.length > 0" class="banner" :autoplay="true" :interval="5000" :circular="true" :indicator-dots="true">
           <swiper-item v-for="(banner, index) in bannerList" :key="banner.id">
             <img :src="banner.imageUrl || banner.imageUpload" class="banner-image" />
           </swiper-item>
         </swiper>
+        <view v-else class="banner banner-loading">
+          <view class="loading-content">
+            <view class="loading-spinner"></view>
+            <text class="loading-text">正在加载...</text>
+          </view>
+        </view>
 
         <!-- 任务列表 -->
         <view class="tasks-section">
@@ -279,7 +285,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { getCurrentUser, logout } from '@/api/auth'
-import { getCmsdata } from '@/api/content'
+import { getCmsdata,getBanners } from '@/api/content'
 import Taro from '@tarojs/taro'
 import logoImage from '@/assets/images/image002.jpg'
 import userInfoImage from '@/assets/images/icon_m_wev8.jpg'
@@ -345,19 +351,23 @@ const handleLogout = async () => {
 // 获取首页轮播数据
 const loadBannerImages = async () => {
   try {
-    const query = `{
-      listSuperAppBanners {
-        data {
-          id
-          Sort
-          imageUrl
-          imageUpload
-        }
-      }
-    }`
-    const response = await getCmsdata(query)
-    if (response.data.data?.listSuperAppBanners?.data) {
-      bannerList.value = response.data.data.listSuperAppBanners.data
+    // const query = `{
+    //   listSuperAppBanners {
+    //     data {
+    //       id
+    //       Sort
+    //       imageUrl
+    //       imageUpload
+    //     }
+    //   }
+    // }`
+    // const response = await getCmsdata(query)
+    // if (response.data.data?.listSuperAppBanners?.data) {
+    //   bannerList.value = response.data.data.listSuperAppBanners.data
+    // }
+    const response = await getBanners()
+    if (response.data.code == 1) {
+      bannerList.value = response.data.bannerList
     }
   } catch (error) {
     console.error('❌ 获取轮播图失败:', error)
@@ -747,6 +757,38 @@ onMounted(async () => {
   border-radius: 8px;
   overflow: hidden;
   margin-bottom: 24px;
+}
+
+.banner-loading {
+  background: linear-gradient(135deg, #f5f7fa 0%, #e0e0e0 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(139, 35, 50, 0.1);
+  border-top-color: #8b2332;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-size: 14px;
+  color: #666;
 }
 
 swiper-item {
