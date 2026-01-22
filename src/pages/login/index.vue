@@ -13,7 +13,6 @@
         <view class="loading-text">{{ loadingText }}</view>
       </view>
     </view>
-
     <nut-toast v-model:visible="toast.visible" :msg="toast.msg" :type="toast.type" />
   </view>
 </template>

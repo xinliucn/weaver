@@ -136,62 +136,30 @@
 
     <!-- 主要内容区域 -->
     <view class="main-content">
-      <!-- 左侧内容 -->
-      <view class="content-left">
-        <!-- Banner -->
-        <swiper v-if="bannerList.length > 0" class="banner" :autoplay="true" :interval="5000" :circular="true" :indicator-dots="true">
-          <swiper-item v-for="(banner, index) in bannerList" :key="banner.id">
-            <img :src="banner.imageUrl || banner.imageUpload" class="banner-image" />
-          </swiper-item>
-        </swiper>
-        <view v-else class="banner banner-loading">
-          <view class="loading-content">
-            <view class="loading-spinner"></view>
-            <text class="loading-text">正在加载...</text>
-          </view>
-        </view>
-
-        <!-- 任务列表 -->
-        <view class="tasks-section">
-          <view class="tabs">
-            <text class="tab active">My Outstanding Tasks</text>
-            <text class="tab">Followed Tasks</text>
-            <text class="tab">My Completed Tasks</text>
-            <text class="tab">My Pending Requests</text>
-          </view>
-
-          <view class="task-list">
-            <view class="task-item">
-              <text class="task-title">CM制造变更--CK Admin--2025-12-08</text>
-              <text class="task-owner">CK Admin</text>
-              <text class="task-date">2025-12-08 01:18:46</text>
-              <text class="task-date">2025-12-08 01:18:46</text>
-            </view>
-          </view>
-        </view>
-      </view>
-
-      <!-- 右侧边栏 -->
-      <view class="sidebar-right">
-        <!-- Quick Access -->
+      <!-- 左列：Process & Applications -->
+      <view class="sidebar-left">
         <view class="widget">
           <view class="widget-header">
-            <text class="widget-title">Quick Access</text>
+            <text class="widget-title">Process & Applications</text>
           </view>
           <view class="quick-access-grid">
-            <view class="access-item" @click="openMiniApp('https://43.132.182.225/wui/cas-entrance.jsp?path=https://43.132.182.225/mobilemode/mobile/view.html?appid=1', 'GLC Portal')">
+            <view class="access-item"
+              @click="openMiniApp('https://oa.dchbipoc.cc/wui/cas-entrance.jsp?path=https://oa.dchbipoc.cc/mobilemode/mobile/view.html?appid=1', 'GLC Portal')">
               <view class="access-icon">🏛️</view>
               <text class="access-label">GLC Portal</text>
             </view>
-            <view class="access-item" @click="openMiniApp('https://43.132.182.225/wui/cas-entrance.jsp?path=https://43.132.182.225/mobilemode/mobile/view.html?appHomepageId=4', 'CCA 手機申請')">
+            <view class="access-item"
+              @click="openMiniApp('https://oa.dchbipoc.cc/wui/cas-entrance.jsp?path=https://oa.dchbipoc.cc/mobilemode/mobile/view.html?appHomepageId=4', 'CCA 手機申請')">
               <view class="access-icon">📝</view>
               <text class="access-label">CCA 手機申請</text>
             </view>
-            <view class="access-item" @click="openMiniApp('https://43.132.182.225/wui/cas-entrance.jsp?path=https://43.132.182.225/mobilemode/mobile/view.html?appHomepageId=3', 'CCA 審批/查看')">
+            <view class="access-item"
+              @click="openMiniApp('https://oa.dchbipoc.cc/wui/cas-entrance.jsp?path=https://oa.dchbipoc.cc/mobilemode/mobile/view.html?appHomepageId=3', 'CCA 審批/查看')">
               <view class="access-icon">✅</view>
               <text class="access-label">CCA 審批/查看</text>
             </view>
-            <view class="access-item" @click="openMiniApp('https://43.132.182.225/wui/cas-entrance.jsp?path=https://43.132.182.225/mobilemode/mobile/view.html?appHomepageId=2', 'CCA 合同列表')">
+            <view class="access-item"
+              @click="openMiniApp('https://oa.dchbipoc.cc/wui/cas-entrance.jsp?path=https://oa.dchbipoc.cc/mobilemode/mobile/view.html?appHomepageId=2', 'CCA 合同列表')">
               <view class="access-icon">📋</view>
               <text class="access-label">CCA 合同列表</text>
             </view>
@@ -209,14 +177,21 @@
             </view>
           </view>
         </view>
+      </view>
 
-        <!-- News -->
-        <view class="widget">
-          <view class="widget-header">
-            <text class="widget-title">News</text>
-          </view>
-          <view class="news-banner">
-            <text class="news-text">Click here to check our latest news</text>
+      <!-- 中列：Banner + News + Departmental Portal + Tasks -->
+      <view class="content-center">
+        <!-- Banner -->
+        <swiper v-if="bannerList.length > 0" class="banner" :autoplay="true" :interval="5000" :circular="true"
+          :indicator-dots="true">
+          <swiper-item v-for="(banner, index) in bannerList" :key="banner.id">
+            <img :src="banner.imageUrl || banner.imageUpload" class="banner-image" />
+          </swiper-item>
+        </swiper>
+        <view v-else class="banner banner-loading">
+          <view class="loading-content">
+            <view class="loading-spinner"></view>
+            <text class="loading-text">正在加载...</text>
           </view>
         </view>
 
@@ -241,7 +216,38 @@
           </view>
         </view>
 
-        <!-- eShop -->
+        <!-- 任务列表 -->
+        <view class="tasks-section">
+          <view class="tabs">
+            <text class="tab active">My Outstanding Tasks</text>
+            <text class="tab">Followed Tasks</text>
+            <text class="tab">My Completed Tasks</text>
+            <text class="tab">My Pending Requests</text>
+          </view>
+
+          <view class="task-list">
+            <view class="task-item">
+              <text class="task-title">CM制造变更--CK Admin--2025-12-08</text>
+              <text class="task-owner">CK Admin</text>
+              <text class="task-date">2025-12-08 01:18:46</text>
+              <text class="task-date">2025-12-08 01:18:46</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- News -->
+        <view class="widget">
+          <view class="widget-header">
+            <text class="widget-title">News</text>
+          </view>
+          <view class="news-banner">
+            <text class="news-text">Click here to check our latest news</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 右列：eShop -->
+      <view class="sidebar-right">
         <view class="widget">
           <view class="widget-header">
             <text class="widget-title">eShop</text>
@@ -285,7 +291,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { getCurrentUser, logout } from '@/api/auth'
-import { getCmsdata,getBanners } from '@/api/content'
+import { getCmsdata, getBanners } from '@/api/content'
 import Taro from '@tarojs/taro'
 import logoImage from '@/assets/images/image002.jpg'
 import userInfoImage from '@/assets/images/icon_m_wev8.jpg'
@@ -327,13 +333,31 @@ const toggleUserMenu = () => {
 
 // 打开 MiniApp
 const openMiniApp = (url: string, title: string) => {
-  console.log('🚀 打开 MiniApp:', url, title)
-  const encodedUrl = encodeURIComponent(url)
-  const encodedTitle = encodeURIComponent(title)
-  const targetUrl = `/pages/miniapp/index?url=${encodedUrl}&title=${encodedTitle}`
-  Taro.navigateTo({
-    url: targetUrl
-  })
+  // 获取当前页面的完整 URL 作为 back_url
+  const backUrl = window.location.href
+
+  // 分离 URL 和 hash 片段
+  const hashIndex = url.indexOf('#')
+  const baseUrl = hashIndex !== -1 ? url.substring(0, hashIndex) : url
+  const hash = hashIndex !== -1 ? url.substring(hashIndex) : ''
+
+  // 在查询字符串中添加 back_url 参数
+  const separator = baseUrl.includes('?') ? '&' : '?'
+  const targetUrl = `${baseUrl}${separator}back_url=${encodeURIComponent(backUrl)}${hash}`
+
+
+  // 检测设备类型
+  const isMobile = Taro.getSystemInfoSync().platform !== 'devtools' &&
+    (Taro.getSystemInfoSync().platform === 'android' ||
+      Taro.getSystemInfoSync().platform === 'ios')
+
+
+  if (isMobile) {
+    //  console.log('isMobile',isMobile);
+    window.location.href = targetUrl
+  } else {
+    window.open(targetUrl, '_blank')
+  }
 }
 
 // 处理登出 - 方案 B：调用后端登出接口
@@ -741,14 +765,176 @@ onMounted(async () => {
   margin-right: auto;
 }
 
-.content-left {
+.sidebar-left {
   flex: 1;
-  min-width: 0;
+  min-width: 280px;
+}
+
+.content-center {
+  flex: 1.5;
+  min-width: 280px;
 }
 
 .sidebar-right {
-  width: 380px;
-  flex-shrink: 0;
+  flex: 1;
+  min-width: 280px;
+}
+
+/* 移动端响应式布局 */
+@media (max-width: 768px) {
+  .top-navbar {
+    height: 60px;
+    padding: 0 16px;
+  }
+
+  .navbar-left {
+    gap: 16px;
+  }
+
+  .logo {
+    height: 32px;
+  }
+
+  .nav-menu {
+    display: none;
+  }
+
+  .search-box {
+    display: none;
+  }
+
+  .icon-btn {
+    display: none;
+  }
+
+  .main-content {
+    margin-top: 60px;
+    flex-direction: column;
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .sidebar-left {
+    width: 100%;
+    order: 2;
+  }
+
+  .content-center {
+    order: 1;
+  }
+
+  .sidebar-right {
+    width: 100%;
+    order: 3;
+  }
+
+  .banner {
+    height: 200px;
+  }
+
+  .quick-access-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .portal-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .eshop-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .tabs {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tab {
+    white-space: nowrap;
+    padding: 12px 16px;
+    font-size: 13px;
+  }
+
+  .task-item {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .certificates-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .cert-item {
+    height: 60px;
+    font-size: 32px;
+  }
+
+  .widget {
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+
+  .widget-title {
+    font-size: 14px;
+  }
+
+  .access-item {
+    gap: 6px;
+  }
+
+  .access-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+
+  .access-label {
+    font-size: 11px;
+  }
+
+  .news-banner {
+    height: 100px;
+  }
+
+  .news-text {
+    font-size: 14px;
+    padding: 0 16px;
+    text-align: center;
+  }
+
+  .portal-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+
+  .portal-label {
+    font-size: 11px;
+  }
+
+  .eshop-logo {
+    font-size: 24px;
+  }
+
+  .user-info {
+    padding: 4px;
+  }
+
+  .username {
+    font-size: 13px;
+  }
+
+  .avatar {
+    width: 28px;
+    height: 28px;
+  }
+
+  .footer-section {
+    padding: 24px 16px;
+  }
 }
 
 /* Banner */
@@ -783,7 +969,9 @@ onMounted(async () => {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-text {
@@ -872,44 +1060,79 @@ swiper-item {
 
 .tabs {
   display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
   border-bottom: 1px solid #e0e0e0;
+  background: #fafafa;
 }
 
 .tab {
-  padding: 16px 24px;
-  font-size: 14px;
+  padding: 14px 20px;
+  font-size: 13px;
   color: #666;
   cursor: pointer;
-  border-bottom: 3px solid transparent;
+  border-bottom: 2px solid transparent;
   margin-bottom: -1px;
+  transition: all 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.tab:hover {
+  color: #8b2332;
+  background: #f5f5f5;
 }
 
 .tab.active {
   color: #8b2332;
   border-bottom-color: #8b2332;
+  background: white;
+  font-weight: 500;
 }
 
 .task-list {
-  padding: 16px;
+  padding: 0;
 }
 
 .task-item {
-  display: grid;
-  grid-template-columns: 1fr auto auto auto;
-  gap: 16px;
-  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 20px;
   border-bottom: 1px solid #f0f0f0;
-  align-items: center;
+  transition: background 0.2s;
+}
+
+.task-item:hover {
+  background: #fafafa;
+}
+
+.task-item:last-child {
+  border-bottom: none;
 }
 
 .task-title {
   font-size: 14px;
   color: #333;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.task-title:hover {
+  color: #8b2332;
+}
+
+.task-meta {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: #999;
 }
 
 .task-owner,
 .task-date {
-  font-size: 13px;
+  font-size: 12px;
   color: #999;
 }
 
@@ -938,30 +1161,30 @@ swiper-item {
 .quick-access-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  gap: 12px;
 }
 
 .access-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   cursor: pointer;
 }
 
 .access-icon {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   border-radius: 8px;
   background: #f5f7fa;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 20px;
 }
 
 .access-label {
-  font-size: 12px;
+  font-size: 11px;
   color: #666;
   text-align: center;
 }
@@ -1019,7 +1242,7 @@ swiper-item {
 .eshop-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  gap: 10px;
 }
 
 .eshop-item {
@@ -1039,7 +1262,7 @@ swiper-item {
 }
 
 .eshop-logo {
-  font-size: 32px;
+  font-size: 24px;
 }
 
 /* 底部认证区域 */
